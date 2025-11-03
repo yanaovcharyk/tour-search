@@ -5,16 +5,18 @@ import { Dropdown } from "./Dropdown/Dropdown.js";
 import { Button } from "./Button/Button.js";
 import { getCountries, searchGeo } from "../../api/api.js";
 import type { GeoEntity } from "../../types/geo.js";
-import { useSearchPrices } from "../../hooks/useSearchPrices.js";
 
-export const SearchForm = () => {
+type SearchFormProps = {
+  onSubmit: (countryID: string) => Promise<void>;
+  isLoading: boolean;
+};
+
+export const SearchForm = ({ onSubmit, isLoading }: SearchFormProps) => {
   const [query, setQuery] = useState("");
   const [options, setOptions] = useState<GeoEntity[]>([]);
   const [selected, setSelected] = useState<GeoEntity | null>(null);
   const [isOpen, setIsOpen] = useState(false);
   const inputRef = useRef<HTMLDivElement>(null);
-
-  const { start, status, error, isLoading, prices } = useSearchPrices();
 
   const loadCountries = async () => {
     const res = await getCountries();
@@ -99,65 +101,37 @@ export const SearchForm = () => {
     }
 
     if (!countryID) {
-      alert(
-        "Щоб запустити пошук, оберіть країну або елемент з відомою країною."
-      );
+      alert("Щоб запустити пошук, оберіть країну або елемент з відомою країною.");
       return;
     }
 
-    await start(countryID);
+    await onSubmit(countryID);
   };
 
   return (
-    <>
-      <div className={styles.wrapper}>
-        <form className={styles.form} onSubmit={handleSubmit}>
-          <label className={styles.label}>Форма пошуку турів</label>
+    <div className={styles.wrapper}>
+      <form className={styles.form} onSubmit={handleSubmit}>
+        <label className={styles.label}>Форма пошуку турів</label>
 
-          <div className={styles.inputBlock} ref={inputRef}>
-            <Input
-              value={query}
-              placeholder="Куди хочете поїхати?"
-              onChange={handleSearch}
-              onClick={handleInputClick}
-              onClear={clearInput}
-            />
-            {isOpen && options.length > 0 && (
-              <Dropdown options={options} onSelect={handleSelect} />
-            )}
-          </div>
-
-          <div className={styles.footer}>
-            <Button type="submit">{isLoading ? "Пошук…" : "Знайти"}</Button>
-          </div>
-        </form>
-
-        <div className={styles.statusBlock}>
-          {isLoading && (
-            <div style={{ marginTop: 12 }}>
-              Завантаження… (очікуємо результати)
-            </div>
-          )}
-
-          {status === "error" && (
-            <div style={{ marginTop: 12, color: "#c00" }}>
-              Помилка: {error || "Не вдалося отримати результати"}
-            </div>
-          )}
-
-          {status === "success" && prices.length === 0 && (
-            <div style={{ marginTop: 12 }}>
-              За вашим запитом турів не знайдено
-            </div>
-          )}
-
-          {status === "success" && prices.length > 0 && (
-            <div style={{ marginTop: 12 }}>
-              Знайдено пропозицій: {prices.length}
-            </div>
+        <div className={styles.inputBlock} ref={inputRef}>
+          <Input
+            value={query}
+            placeholder="Куди хочете поїхати?"
+            onChange={handleSearch}
+            onClick={handleInputClick}
+            onClear={clearInput}
+          />
+          {isOpen && options.length > 0 && (
+            <Dropdown options={options} onSelect={handleSelect} />
           )}
         </div>
-      </div>
-    </>
+
+        <div className={styles.footer}>
+          <Button type="submit">
+            {isLoading ? "Пошук…" : "Знайти"}
+          </Button>
+        </div>
+      </form>
+    </div>
   );
 };

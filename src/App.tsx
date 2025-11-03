@@ -1,9 +1,10 @@
-import { SearchForm } from "./components/SearchForm/SearchForm";
+import { SearchPage } from "./pages/SearchPage/SearchPage";
+import "./App.css";
 
 function App() {
   return (
-    <div style={{ display: "flex", justifyContent: "center" }}>
-      <SearchForm />
+    <div className="app-container">
+      <SearchPage />
     </div>
   );
 }
