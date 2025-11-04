@@ -1,5 +1,7 @@
 import styles from "./SearchResults.module.scss";
 import type { Hotel } from "../../hooks/useHotels";
+import { Link } from "react-router-dom";
+import { formatDate, formatMoney } from "../../utils/formatters";
 
 type Price = {
   id: string;
@@ -17,32 +19,16 @@ type Props = {
   error?: string | null;
 };
 
-const formatDate = (iso: string) =>
-  new Date(iso).toLocaleDateString("uk-UA", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-  });
 
-const formatMoney = (amount: number, currency: string) => {
-  const nf = new Intl.NumberFormat("uk-UA");
-  return `${nf.format(amount)} ${currency.toUpperCase()}`;
-};
-
-export function SearchResults({
-  prices,
-  hotelsMap,
-  isLoading,
-  error,
-}: Props) {
+export function SearchResults({ prices, hotelsMap, isLoading, error }: Props) {
   return (
     <section className={styles.container} aria-live="polite">
-      {isLoading && <div className={styles.info}>Завантаження результатів…</div>}
+      {isLoading && (
+        <div className={styles.info}>Завантаження результатів…</div>
+      )}
 
       {!!error && (
-        <div className={`${styles.info} ${styles.error}`}>
-          Помилка: {error}
-        </div>
+        <div className={`${styles.info} ${styles.error}`}>Помилка: {error}</div>
       )}
 
       {!isLoading && !error && prices.length === 0 && (
@@ -74,12 +60,12 @@ export function SearchResults({
                   <div className={styles.price}>
                     {formatMoney(p.amount, p.currency)}
                   </div>
-                  <a
+                  <Link
                     className={styles.link}
-                    href={`/price/${p.id}?hotelId=${hotel.id}`}
+                    to={`/tour/${hotel.id}/${p.id}`}
                   >
                     Відкрити ціну
-                  </a>
+                  </Link>
                 </div>
               </li>
             );
