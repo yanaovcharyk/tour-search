@@ -82,31 +82,34 @@ export const SearchForm = ({ onSubmit, isLoading }: SearchFormProps) => {
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsOpen(false);
+  e.preventDefault();
 
-    if (!selected) return;
+  if (isLoading) return;
 
-    let countryID: string | undefined;
+  setIsOpen(false);
 
-    if (selected.type === "country") {
-      countryID = String(selected.id);
-    } else if ("countryId" in selected && selected.countryId) {
-      countryID = String(selected.countryId);
-    } else {
-      const anyCountry = options.find((o) => o.type === "country");
-      if (anyCountry) {
-        countryID = String(anyCountry.id);
-      }
+  if (!selected) return;
+
+  let countryID: string | undefined;
+
+  if (selected.type === "country") {
+    countryID = String(selected.id);
+  } else if ("countryId" in selected && selected.countryId) {
+    countryID = String(selected.countryId);
+  } else {
+    const anyCountry = options.find((o) => o.type === "country");
+    if (anyCountry) {
+      countryID = String(anyCountry.id);
     }
+  }
 
-    if (!countryID) {
-      alert("Щоб запустити пошук, оберіть країну або елемент з відомою країною.");
-      return;
-    }
+  if (!countryID) {
+    alert("Щоб запустити пошук, оберіть країну або елемент з відомою країною.");
+    return;
+  }
 
-    await onSubmit(countryID);
-  };
+  await onSubmit(countryID);
+};
 
   return (
     <div className={styles.wrapper}>
@@ -127,7 +130,7 @@ export const SearchForm = ({ onSubmit, isLoading }: SearchFormProps) => {
         </div>
 
         <div className={styles.footer}>
-          <Button type="submit">
+          <Button type="submit" disabled={isLoading}>
             {isLoading ? "Пошук…" : "Знайти"}
           </Button>
         </div>
